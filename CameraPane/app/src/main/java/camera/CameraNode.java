@@ -3,7 +3,6 @@ package camera;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.scene.Node;
 import lombok.Getter;
-import lombok.Setter;
 
 public class CameraNode {
 
@@ -22,7 +21,10 @@ public class CameraNode {
 	private final double positionReferenceY;
 
 	/**
-	 * A wrapping class for a Node that is compatible with CameraPane.
+	 * A wrapping class for a Node that is compatible with CameraPane. NOTE: When translating or
+	 * scaling the Node, do NOT use the Node's translateX, translateY, scaleX, or scaleY property.
+	 * Instead, use the CameraNode's intrinsicCenterX, intrinsicCenterY, intrinsicScaleX, and
+	 * intrinsicScaleY.
 	 *
 	 * @param node A Node
 	 * @param positionReferenceX Where the x position of the Node is determined. A value of 0
@@ -61,7 +63,7 @@ public class CameraNode {
 	public void callibrateDisplay(double shiftX, double shiftY, double zoom) {
 		node.setScaleX(intrinsicScaleX.get() * zoom);
 		node.setScaleY(intrinsicScaleY.get() * zoom);
-
+		setNodeCenter(zoom * intrinsicCenterX.get() + shiftX, zoom * intrinsicCenterY.get() + shiftY);
 	}
 
 }
