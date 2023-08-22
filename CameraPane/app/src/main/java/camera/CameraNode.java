@@ -21,10 +21,18 @@ public class CameraNode {
 	private final double positionReferenceY;
 
 	/**
-	 * A wrapping class for a Node that is compatible with CameraPane. NOTE: When translating or
-	 * scaling the Node, do NOT use the Node's translateX, translateY, scaleX, or scaleY property.
-	 * Instead, use the CameraNode's intrinsicCenterX, intrinsicCenterY, intrinsicScaleX, and
-	 * intrinsicScaleY.
+	 * A wrapping class for a Node that is compatible with CameraPane.
+	 * <br>
+	 * <br>
+	 *
+	 * NOTE: When translating or scaling the Node, do NOT use the Node's translateX, translateY,
+	 * scaleX, or scaleY property. Instead, use the CameraNode's intrinsicCenterX, intrinsicCenterY,
+	 * intrinsicScaleX, and intrinsicScaleY.
+	 * <br>
+	 * <br>
+	 *
+	 * NOTE: Intrinsic position of (0, 0) is the center of the CameraPane's screen, not the top left
+	 * corner.
 	 *
 	 * @param node A Node
 	 * @param positionReferenceX Where the x position of the Node is determined. A value of 0
