@@ -27,13 +27,10 @@ public class CameraPane extends Pane {
 
 	public CameraPane(double intrinsicBackstageWidth, double intrinsicBackstageHeight, double prefWidth, double prefHeight, CameraNode... cNodes) {
 		super();
-		if (prefWidth < intrinsicBackstageWidth || prefHeight < intrinsicBackstageHeight) {
-			(new FitException("ERROR: Cannot create CameraPane, as intrinsic backstage is smaller than pane.")).quitProgram();
-		}
-		setPrefWidth(prefWidth);
-		setPrefHeight(prefHeight);
 		this.intrinsicBackstageWidth = intrinsicBackstageWidth;
 		this.intrinsicBackstageHeight = intrinsicBackstageHeight;
+		setPrefWidth(prefWidth);
+		setPrefHeight(prefHeight);
 		setInitialShift();
 		initListeners();
 		addElement(cNodes);
@@ -61,6 +58,22 @@ public class CameraPane extends Pane {
 		toCenterY.addListener((obs, oldV, newV) -> {
 			shiftY += zoom.get() * (oldV - newV);
 		});
+		prefWidthProperty().addListener(l -> {
+			validatePrefSize();
+		});
+		prefHeightProperty().addListener(l -> {
+			validatePrefSize();
+		});
+	}
+
+	private void validatePrefSize() {
+		if (getPrefWidth() < intrinsicBackstageWidth || getPrefHeight() < intrinsicBackstageHeight) {
+			(new FitException("Cannot create CameraPane, as intrinsic backstage is smaller than pane.\n-->"
+					+ " iW = " + intrinsicBackstageWidth
+					+ ". iH = " + intrinsicBackstageHeight
+					+ ". pW = " + getPrefWidth()
+					+ ". pH = " + getPrefHeight() + ".")).quitProgram();
+		}
 	}
 
 	public final void addElement(CameraNode... cNodes) {
@@ -98,7 +111,11 @@ public class CameraPane extends Pane {
 	}
 
 	private void fitPanning() throws FitException {
+		boolean errX = false, errY = false;
+		//Check right edge.
+		if (zoom.get() * intrinsicBackstageWidth / 2 + shiftX < getPrefWidth()) {
 
+		}
 	}
 
 	private void fitZooming() throws FitException {
@@ -115,7 +132,6 @@ public class CameraPane extends Pane {
 		}
 
 		void quitProgram() {
-			System.err.println(message + "\n");
 			printStackTrace();
 			System.exit(2);
 		}
