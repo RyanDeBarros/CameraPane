@@ -1,6 +1,8 @@
 package camera;
 
 import javafx.beans.property.SimpleObjectProperty;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.scene.Node;
 import lombok.Getter;
 
@@ -13,12 +15,20 @@ public class CameraNode {
 	@Getter
 	private final SimpleObjectProperty<Double> intrinsicCenterY = new SimpleObjectProperty<>(0d);
 	@Getter
-	private final SimpleObjectProperty<Double> intrinsicScaleX = new SimpleObjectProperty<>(0d);
+	private final SimpleObjectProperty<Double> intrinsicScaleX = new SimpleObjectProperty<>(1d);
 	@Getter
-	private final SimpleObjectProperty<Double> intrinsicScaleY = new SimpleObjectProperty<>(0d);
+	private final SimpleObjectProperty<Double> intrinsicScaleY = new SimpleObjectProperty<>(1d);
 
 	private final double positionReferenceX;
 	private final double positionReferenceY;
+
+	private double lastZoom = 1;
+	private double lastShiftX = 0;
+	private double lastShiftY = 0;
+
+	private final ChangeListener<Double> callibrate = (ObservableValue<? extends Double> obs, Double oldV, Double newV) -> {
+		callibrateDisplay(lastZoom, lastShiftX, lastShiftY);
+	};
 
 	/**
 	 * A wrapping class for a Node that is compatible with CameraPane.
@@ -45,7 +55,10 @@ public class CameraNode {
 	}
 
 	private void initPropertyListeners() {
-		// TODO update display when intrinsic properties are changed.
+		intrinsicCenterX.addListener(callibrate);
+		intrinsicCenterY.addListener(callibrate);
+		intrinsicScaleX.addListener(callibrate);
+		intrinsicScaleY.addListener(callibrate);
 	}
 
 	public static Node[] extractNodes(CameraNode... cNodes) {
@@ -56,7 +69,12 @@ public class CameraNode {
 		return nodes;
 	}
 
-	public void setNodeCenter(double cx, double cy) {
+	public void setIntrinsicCenter(double cx, double cy) {
+		intrinsicCenterX.set(cx);
+		intrinsicCenterY.set(cy);
+	}
+
+	private void setNodeCenter(double cx, double cy) {
 		double offsetX = node.getLayoutBounds().getWidth() * (positionReferenceX - 0.5);
 		node.setLayoutX(cx + offsetX);
 		double offsetY = node.getLayoutBounds().getHeight() * (positionReferenceY - 0.5);
@@ -64,8 +82,12 @@ public class CameraNode {
 	}
 
 	public void callibrateDisplay(double zoom, double shiftX, double shiftY) {
-		node.setTranslateX(zoom * intrinsicCenterX.get() + shiftX);
-		node.setTranslateY(zoom * intrinsicCenterY.get() + shiftY);
+		lastZoom = zoom;
+		lastShiftX = shiftX;
+		lastShiftY = shiftY;
+		node.setScaleX(zoom * intrinsicScaleX.get());
+		node.setScaleY(zoom * intrinsicScaleY.get());
+		setNodeCenter(zoom * intrinsicCenterX.get() + shiftX, zoom * intrinsicCenterY.get() + shiftY);
 	}
 
 }

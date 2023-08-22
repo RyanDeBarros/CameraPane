@@ -12,6 +12,8 @@ public class CameraPane extends Pane {
 	private double toCenterX;
 	private double toCenterY;
 	private double zoom = 1;
+	@Setter
+	private double maxZoom = 4;
 
 	@Getter
 	private final SimpleObjectProperty<Double> scrollSensitivity = new SimpleObjectProperty<>(1.00696);
@@ -80,6 +82,18 @@ public class CameraPane extends Pane {
 	}
 
 	public void zoom(double dScroll) {
+		zoom *= Math.pow(scrollSensitivity.get(), dScroll);
+		boolean errZ = false;
+		if (zoom > maxZoom) {
+			errZ = true;
+			zoom = maxZoom;
+		}
+		if (zoom < minZoom()) {
+			if (errZ) {
+				(new FitException("Could not set zoom.")).quitProgram();
+			}
+			zoom = minZoom();
+		}
 		fitBackstage();
 	}
 
@@ -145,6 +159,12 @@ public class CameraPane extends Pane {
 
 	private double shiftY() {
 		return getPrefHeight() / 2 - zoom * toCenterY;
+	}
+
+	private double minZoom() {
+		double minZW = getPrefWidth() / intrinsicBackstageWidth;
+		double minZH = getPrefHeight() / intrinsicBackstageHeight;
+		return minZW > minZH ? minZW : minZH;
 	}
 
 }
