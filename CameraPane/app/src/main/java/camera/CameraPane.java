@@ -9,13 +9,9 @@ import lombok.Setter;
 
 public class CameraPane extends Pane {
 
-	private double shiftX;
-	private double shiftY;
-	private final SimpleObjectProperty<Double> zoom = new SimpleObjectProperty<>(1d);
-	private final SimpleObjectProperty<Double> toCenterX;
-	private final SimpleObjectProperty<Double> toCenterY;
-	@Setter
-	private double maxZoom;
+	private double toCenterX;
+	private double toCenterY;
+	private double zoom = 1;
 
 	@Getter
 	private final SimpleObjectProperty<Double> scrollSensitivity = new SimpleObjectProperty<>(1.00696);
@@ -33,17 +29,10 @@ public class CameraPane extends Pane {
 		this.intrinsicBackstageHeight = intrinsicBackstageHeight;
 		setPrefWidth(prefWidth);
 		setPrefHeight(prefHeight);
-		this.toCenterX = new SimpleObjectProperty<>(toCenterX);
-		this.toCenterY = new SimpleObjectProperty<>(toCenterY);
-		setInitialShift();
+		this.toCenterX = toCenterX;
+		this.toCenterY = toCenterY;
 		initListeners();
 		addElement(cNodes);
-	}
-
-	private void setInitialShift() {
-		shiftX = getPrefWidth() / 2 - zoom.get() * toCenterX.get();
-		shiftY = getPrefHeight() / 2 - zoom.get() * toCenterY.get();
-		fitBackstage();
 	}
 
 	private void initListeners() {
@@ -52,22 +41,13 @@ public class CameraPane extends Pane {
 				scrollSensitivity.set(minimumSensitivity);
 			}
 		});
-		zoom.addListener((obs, oldV, newV) -> {
-			// Adjust shifts so that it appears that the center of pane is point of origin of zoom.
-			shiftX += toCenterX.get() * (oldV - newV);
-			shiftY += toCenterY.get() * (oldV - newV);
-		});
-		toCenterX.addListener((obs, oldV, newV) -> {
-			shiftX += zoom.get() * (oldV - newV);
-		});
-		toCenterY.addListener((obs, oldV, newV) -> {
-			shiftY += zoom.get() * (oldV - newV);
-		});
 		prefWidthProperty().addListener(l -> {
 			validatePrefSize();
+			callibrateDisplay();
 		});
 		prefHeightProperty().addListener(l -> {
 			validatePrefSize();
+			callibrateDisplay();
 		});
 	}
 
@@ -88,19 +68,16 @@ public class CameraPane extends Pane {
 	}
 
 	private void callibrateDisplay() {
-		System.out.println("\n");
-		cameraElements.forEach(e -> e.callibrateDisplay(shiftX, shiftY, zoom.get()));
+		cameraElements.forEach(e -> e.callibrateDisplay(zoom, shiftX(), shiftY()));
 	}
 
 	public void pan(double dx, double dy) {
-		toCenterX.set(toCenterX.get() + dx / zoom.get());
-		toCenterY.set(toCenterY.get() + dy / zoom.get());
+		toCenterX -= dx / zoom;
+		toCenterY -= dy / zoom;
 		fitBackstage();
 	}
 
 	public void zoom(double dScroll) {
-		double newZoom = zoom.get() * Math.pow(scrollSensitivity.get(), dScroll);
-		zoom.set(newZoom < maxZoom ? newZoom : maxZoom);
 		fitBackstage();
 	}
 
@@ -138,6 +115,14 @@ public class CameraPane extends Pane {
 			printStackTrace();
 			System.exit(2);
 		}
+	}
+
+	private double shiftX() {
+		return getPrefWidth() / 2 - zoom * toCenterX;
+	}
+
+	private double shiftY() {
+		return getPrefHeight() / 2 - zoom * toCenterY;
 	}
 
 }

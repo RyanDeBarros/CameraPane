@@ -14,11 +14,12 @@ public class App extends Application {
 
 	@Override
 	public void start(Stage primaryStage) {
-		MouseCameraPane mPane = new MouseCameraPane(1000, 700, 500, 350, 0, 0);
-		Rectangle r1 = new Rectangle(600, 250, Color.ORANGE);
-		Rectangle r2 = new Rectangle(200, 100, Color.BLUE);
-		mPane.addElement(new CameraNode(r1, 0, 0), new CameraNode(r2, 0, 0));
-		System.out.println(mPane.getChildren());
+		MouseCameraPane mPane = new MouseCameraPane(1000, 700, 750, 500, 500, 380);
+		CameraNode n1 = new CameraNode(new Rectangle(1000, 700, Color.ORANGE), 0, 0);
+		CameraNode n2 = new CameraNode(new Rectangle(750, 500, Color.BLUE), 0, 0);
+		n1.setNodeCenter(500, 350);
+		n2.setNodeCenter(500, 350);
+		mPane.addElement(n1, n2);
 
 		primaryStage.setScene(new Scene(mPane));
 		primaryStage.setTitle("Testing");

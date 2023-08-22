@@ -63,12 +63,9 @@ public class CameraNode {
 		node.setLayoutY(cy + offsetY);
 	}
 
-	public void callibrateDisplay(double shiftX, double shiftY, double zoom) {
-		node.setScaleX(intrinsicScaleX.get() * zoom);
-		node.setScaleY(intrinsicScaleY.get() * zoom);
-		System.out.println(shiftX + " " + shiftY + " " + zoom + " " + intrinsicCenterX.get() + " " + intrinsicCenterY.get());
-		setNodeCenter(zoom * intrinsicCenterX.get() + shiftX, zoom * intrinsicCenterY.get() + shiftY);
-		System.out.println("\t\t\t" + node.getLayoutX() + " " + node.getLayoutY());
+	public void callibrateDisplay(double zoom, double shiftX, double shiftY) {
+		node.setTranslateX(zoom * intrinsicCenterX.get() + shiftX);
+		node.setTranslateY(zoom * intrinsicCenterY.get() + shiftY);
 	}
 
 }
