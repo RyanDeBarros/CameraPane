@@ -46,17 +46,25 @@ public class CameraPane extends Pane {
 		prefWidthProperty().addListener(l -> {
 			validatePrefSize();
 			toCenterX = getPrefWidth() / 2;
-			fitBackstage();
+			try {
+				fitPanning();
+			} catch (FitException fe) {
+				fe.quitProgram();
+			}
 		});
 		prefHeightProperty().addListener(l -> {
 			validatePrefSize();
 			toCenterY = getPrefHeight() / 2;
-			fitBackstage();
+			try {
+				fitPanning();
+			} catch (FitException fe) {
+				fe.quitProgram();
+			}
 		});
 	}
 
 	private void validatePrefSize() {
-		if (getPrefWidth() < intrinsicBackstageWidth || getPrefHeight() < intrinsicBackstageHeight) {
+		if (getPrefWidth() > intrinsicBackstageWidth || getPrefHeight() > intrinsicBackstageHeight) {
 			(new FitException("Cannot create CameraPane, as intrinsic backstage is smaller than pane.\n-->"
 					+ " iW = " + intrinsicBackstageWidth
 					+ ". iH = " + intrinsicBackstageHeight
@@ -78,36 +86,31 @@ public class CameraPane extends Pane {
 	public void pan(double dx, double dy) {
 		toCenterX -= dx / zoom;
 		toCenterY -= dy / zoom;
-		fitBackstage();
+		try {
+			fitPanning();
+		} catch (FitException fe) {
+			fe.quitProgram();
+		}
 	}
 
 	public void zoom(double dScroll) {
-		zoom *= Math.pow(scrollSensitivity.get(), dScroll);
-		boolean errZ = false;
-		if (zoom > maxZoom) {
-			errZ = true;
-			zoom = maxZoom;
-		}
-		if (zoom < minZoom()) {
-			if (errZ) {
-				(new FitException("Could not set zoom.")).quitProgram();
-			}
-			zoom = minZoom();
-		}
-		fitBackstage();
-	}
-
-	private void fitBackstage() {
 		try {
-			fitPanning();
-		} catch (FitException fep) {
-			try {
-				fitZooming();
-			} catch (FitException fez) {
-				fez.quitProgram();
+			zoom *= Math.pow(scrollSensitivity.get(), dScroll);
+			boolean errZ = false;
+			if (zoom > maxZoom) {
+				errZ = true;
+				zoom = maxZoom;
 			}
+			if (zoom < minZoom()) {
+				if (errZ) {
+					throw new FitException("Could not set zoom");
+				}
+				zoom = minZoom();
+			}
+			fitPanning();
+		} catch (FitException fe) {
+			fe.quitProgram();
 		}
-		callibrateDisplay();
 	}
 
 	private void fitPanning() throws FitException {
@@ -132,25 +135,7 @@ public class CameraPane extends Pane {
 			}
 			toCenterY = intrinsicBackstageHeight - getPrefHeight() / (2 * zoom);
 		}
-	}
-
-	private void fitZooming() throws FitException {
-
-	}
-
-	private static class FitException extends Exception {
-
-		private final String message;
-
-		FitException(String message) {
-			super(message);
-			this.message = message;
-		}
-
-		void quitProgram() {
-			printStackTrace();
-			System.exit(2);
-		}
+		callibrateDisplay();
 	}
 
 	private double shiftX() {
@@ -165,6 +150,18 @@ public class CameraPane extends Pane {
 		double minZW = getPrefWidth() / intrinsicBackstageWidth;
 		double minZH = getPrefHeight() / intrinsicBackstageHeight;
 		return minZW > minZH ? minZW : minZH;
+	}
+
+	private static class FitException extends Exception {
+
+		FitException(String message) {
+			super(message);
+		}
+
+		void quitProgram() {
+			printStackTrace();
+			System.exit(2);
+		}
 	}
 
 }
