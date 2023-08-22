@@ -43,11 +43,13 @@ public class CameraPane extends Pane {
 		});
 		prefWidthProperty().addListener(l -> {
 			validatePrefSize();
-			callibrateDisplay();
+			toCenterX = getPrefWidth() / 2;
+			fitBackstage();
 		});
 		prefHeightProperty().addListener(l -> {
 			validatePrefSize();
-			callibrateDisplay();
+			toCenterY = getPrefHeight() / 2;
+			fitBackstage();
 		});
 	}
 
@@ -96,6 +98,26 @@ public class CameraPane extends Pane {
 
 	private void fitPanning() throws FitException {
 		boolean errX = false, errY = false;
+		if (shiftX() > 0) {
+			errX = true;
+			toCenterX = getPrefWidth() / (2 * zoom);
+		}
+		if (zoom * intrinsicBackstageWidth + shiftX() < getPrefWidth()) {
+			if (errX) {
+				throw new FitException("Could not fit panning (horizontally).");
+			}
+			toCenterX = intrinsicBackstageWidth - getPrefWidth() / (2 * zoom);
+		}
+		if (shiftY() > 0) {
+			errY = true;
+			toCenterY = getPrefHeight() / (2 * zoom);
+		}
+		if (zoom * intrinsicBackstageHeight + shiftY() < getPrefHeight()) {
+			if (errY) {
+				throw new FitException("Could not fit panning (vertically).");
+			}
+			toCenterY = intrinsicBackstageHeight - getPrefHeight() / (2 * zoom);
+		}
 	}
 
 	private void fitZooming() throws FitException {

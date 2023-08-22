@@ -24,5 +24,7 @@ public class App extends Application {
 		primaryStage.setScene(new Scene(mPane));
 		primaryStage.setTitle("Testing");
 		primaryStage.show();
+		primaryStage.widthProperty().addListener(l -> mPane.setPrefWidth(primaryStage.widthProperty().get()));
+		primaryStage.heightProperty().addListener(l -> mPane.setPrefHeight(primaryStage.heightProperty().get()));
 	}
 }
