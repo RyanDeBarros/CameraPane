@@ -14,7 +14,7 @@ public class App extends Application {
 
 	@Override
 	public void start(Stage primaryStage) {
-		MouseCameraPane mPane = new MouseCameraPane(1000, 700, 750, 500, 500, 380);
+		MouseCameraPane mPane = new MouseCameraPane(1000, 700, 750, 500, 500, 350);
 		CameraNode n1 = new CameraNode(new Rectangle(1000, 700, Color.ORANGE), 0, 0);
 		CameraNode n2 = new CameraNode(new Rectangle(750, 500, Color.BLUE), 0, 0);
 		CameraNode n3 = new CameraNode(new Rectangle(100, 200, Color.GREEN), 0, 0);

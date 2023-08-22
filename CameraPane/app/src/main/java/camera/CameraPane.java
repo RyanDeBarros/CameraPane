@@ -22,7 +22,7 @@ public class CameraPane extends Pane {
 	private final double intrinsicBackstageWidth;
 	private final double intrinsicBackstageHeight;
 
-	private final ArrayList<CameraNode> cameraElements = new ArrayList<>();
+	protected final ArrayList<CameraNode> cameraElements = new ArrayList<>();
 
 	public CameraPane(double intrinsicBackstageWidth, double intrinsicBackstageHeight,
 			double prefWidth, double prefHeight, double toCenterX, double toCenterY, CameraNode... cNodes) {
@@ -66,10 +66,10 @@ public class CameraPane extends Pane {
 	private void validatePrefSize() {
 		if (getPrefWidth() > intrinsicBackstageWidth || getPrefHeight() > intrinsicBackstageHeight) {
 			(new FitException("Cannot create CameraPane, as intrinsic backstage is smaller than pane.\n-->"
-					+ " iW = " + intrinsicBackstageWidth
-					+ ". iH = " + intrinsicBackstageHeight
-					+ ". pW = " + getPrefWidth()
-					+ ". pH = " + getPrefHeight() + ".")).quitProgram();
+					+ " iW = " + intrinsicBackstageWidth + "."
+					+ " iH = " + intrinsicBackstageHeight + "."
+					+ " pW = " + getPrefWidth() + "."
+					+ " pH = " + getPrefHeight() + ".")).quitProgram();
 		}
 	}
 
