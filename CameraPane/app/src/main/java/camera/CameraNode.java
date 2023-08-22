@@ -28,11 +28,6 @@ public class CameraNode {
 	 * NOTE: When translating or scaling the Node, do NOT use the Node's translateX, translateY,
 	 * scaleX, or scaleY property. Instead, use the CameraNode's intrinsicCenterX, intrinsicCenterY,
 	 * intrinsicScaleX, and intrinsicScaleY.
-	 * <br>
-	 * <br>
-	 *
-	 * NOTE: Intrinsic position of (0, 0) is the center of the CameraPane's screen, not the top left
-	 * corner.
 	 *
 	 * @param node A Node
 	 * @param positionReferenceX Where the x position of the Node is determined. A value of 0
@@ -63,15 +58,17 @@ public class CameraNode {
 
 	public void setNodeCenter(double cx, double cy) {
 		double offsetX = node.getLayoutBounds().getWidth() * (positionReferenceX - 0.5);
-		node.setTranslateX(cx + offsetX);
+		node.setLayoutX(cx + offsetX);
 		double offsetY = node.getLayoutBounds().getHeight() * (positionReferenceY - 0.5);
-		node.setTranslateY(cy + offsetY);
+		node.setLayoutY(cy + offsetY);
 	}
 
 	public void callibrateDisplay(double shiftX, double shiftY, double zoom) {
 		node.setScaleX(intrinsicScaleX.get() * zoom);
 		node.setScaleY(intrinsicScaleY.get() * zoom);
+		System.out.println(shiftX + " " + shiftY + " " + zoom + " " + intrinsicCenterX.get() + " " + intrinsicCenterY.get());
 		setNodeCenter(zoom * intrinsicCenterX.get() + shiftX, zoom * intrinsicCenterY.get() + shiftY);
+		System.out.println("\t\t\t" + node.getLayoutX() + " " + node.getLayoutY());
 	}
 
 }

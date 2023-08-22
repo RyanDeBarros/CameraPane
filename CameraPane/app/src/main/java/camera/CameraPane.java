@@ -1,6 +1,7 @@
 package camera;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.scene.layout.Pane;
 import lombok.Getter;
@@ -11,8 +12,8 @@ public class CameraPane extends Pane {
 	private double shiftX;
 	private double shiftY;
 	private final SimpleObjectProperty<Double> zoom = new SimpleObjectProperty<>(1d);
-	private final SimpleObjectProperty<Double> toCenterX = new SimpleObjectProperty<>(0d);
-	private final SimpleObjectProperty<Double> toCenterY = new SimpleObjectProperty<>(0d);
+	private final SimpleObjectProperty<Double> toCenterX;
+	private final SimpleObjectProperty<Double> toCenterY;
 	@Setter
 	private double maxZoom;
 
@@ -25,20 +26,24 @@ public class CameraPane extends Pane {
 
 	private final ArrayList<CameraNode> cameraElements = new ArrayList<>();
 
-	public CameraPane(double intrinsicBackstageWidth, double intrinsicBackstageHeight, double prefWidth, double prefHeight, CameraNode... cNodes) {
+	public CameraPane(double intrinsicBackstageWidth, double intrinsicBackstageHeight,
+			double prefWidth, double prefHeight, double toCenterX, double toCenterY, CameraNode... cNodes) {
 		super();
 		this.intrinsicBackstageWidth = intrinsicBackstageWidth;
 		this.intrinsicBackstageHeight = intrinsicBackstageHeight;
 		setPrefWidth(prefWidth);
 		setPrefHeight(prefHeight);
+		this.toCenterX = new SimpleObjectProperty<>(toCenterX);
+		this.toCenterY = new SimpleObjectProperty<>(toCenterY);
 		setInitialShift();
 		initListeners();
 		addElement(cNodes);
 	}
 
 	private void setInitialShift() {
-		shiftX = getPrefWidth() / 2;
-		shiftY = getPrefHeight() / 2;
+		shiftX = getPrefWidth() / 2 - zoom.get() * toCenterX.get();
+		shiftY = getPrefHeight() / 2 - zoom.get() * toCenterY.get();
+		fitBackstage();
 	}
 
 	private void initListeners() {
@@ -77,11 +82,13 @@ public class CameraPane extends Pane {
 	}
 
 	public final void addElement(CameraNode... cNodes) {
-		cameraElements.addAll(cameraElements);
 		getChildren().addAll(CameraNode.extractNodes(cNodes));
+		cameraElements.addAll(Arrays.asList(cNodes));
+		callibrateDisplay();
 	}
 
 	private void callibrateDisplay() {
+		System.out.println("\n");
 		cameraElements.forEach(e -> e.callibrateDisplay(shiftX, shiftY, zoom.get()));
 	}
 
@@ -112,10 +119,6 @@ public class CameraPane extends Pane {
 
 	private void fitPanning() throws FitException {
 		boolean errX = false, errY = false;
-		//Check right edge.
-		if (zoom.get() * intrinsicBackstageWidth / 2 + shiftX < getPrefWidth()) {
-
-		}
 	}
 
 	private void fitZooming() throws FitException {

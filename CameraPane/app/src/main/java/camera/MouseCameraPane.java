@@ -13,8 +13,9 @@ public class MouseCameraPane extends CameraPane {
 	private double prevX;
 	private double prevY;
 
-	public MouseCameraPane(double intrinsicBackstageWidth, double intrinsicBackstageHeight, double prefWidth, double prefHeight, CameraNode... cNodes) {
-		super(intrinsicBackstageWidth, intrinsicBackstageHeight, prefWidth, prefHeight, cNodes);
+	public MouseCameraPane(double intrinsicBackstageWidth, double intrinsicBackstageHeight,
+			double prefWidth, double prefHeight, double toCenterX, double toCenterY, CameraNode... cNodes) {
+		super(intrinsicBackstageWidth, intrinsicBackstageHeight, prefWidth, prefHeight, toCenterX, toCenterY, cNodes);
 		initMouseListeners();
 	}
 
